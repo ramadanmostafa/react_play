@@ -2,24 +2,30 @@ import React, { Component } from 'react';
 import styles from './App.css';
 import Persons from './../components/Persons/Persons';
 import Cockpit from './../components/Cockpit/Cockpit';
+import withClass from "../hoc/withClass";
+import Aux from '../hoc/Aux';
 
 class App extends Component {
   constructor (props) {
     super(props);
     this.state = {
       persons: [
-        {id: 1, name: 'Ramadan', age: '28'},
-        {id: 2, name: 'Aya', age: '23', hobby: 'chess'},
-        {id: 3, name: 'Nelly', age: '28'},
+        {id: 1, name: 'Ramadan', age: 28},
+        {id: 2, name: 'Aya', age: 23, hobby: 'chess'},
+        {id: 3, name: 'Nelly', age: 28},
       ],
       otherState: 'some other value',
-      showPersons: false
+      showPersons: false,
+      toggleClicked: 0
     };
   };
   
   
   togglePersonsHandler = () => {
-    this.setState({showPersons: !this.state.showPersons})
+    // to prevent a race condition
+    this.setState((pervState, props) => {
+      return {showPersons: !pervState.showPersons, toggleClicked: pervState.toggleClicked + 1};
+    });
   };
   
   deletePersonHandler = (personId) => {
@@ -49,16 +55,16 @@ class App extends Component {
     }
     
     return (
-      <div className={styles.App}>
+      <Aux>
         <Cockpit
           appTitle={this.props.appTitle}
           showPersons={this.state.showPersons}
           persons={this.state.persons}
           clicked={this.togglePersonsHandler} />
         {persons}
-      </div>
+      </Aux>
     );
   }
 }
 
-export default App;
+export default withClass(App, styles.App);
